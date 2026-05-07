@@ -29,12 +29,6 @@ class RegistrationController extends AbstractController
         UserPasswordHasherInterface $passwordHasher,
         EntityManagerInterface $entityManager,
     ): Response {
-        // Direct file logging
-        $debugFile = 'C:/xampp/htdocs/UniLearn-PI-main-final/var/log/registration_debug.log';
-        file_put_contents($debugFile, "\n=== " . date('Y-m-d H:i:s') . " ===\n", FILE_APPEND);
-        file_put_contents($debugFile, "Request method: " . $request->getMethod() . "\n", FILE_APPEND);
-        file_put_contents($debugFile, "Is AJAX: " . ($request->isXmlHttpRequest() ? 'yes' : 'no') . "\n", FILE_APPEND);
-        file_put_contents($debugFile, "All POST data: " . print_r($request->request->all(), true) . "\n", FILE_APPEND);
         
         $user = new User();
         $form = $this->createForm(RegistrationType::class, $user);
@@ -91,21 +85,16 @@ class RegistrationController extends AbstractController
 
                 // Handle face registration if image was provided
                 $faceImage = $form->get('faceImage')->getData();
-                file_put_contents($debugFile, "Face image from form: " . (is_string($faceImage) ? 'yes (length: ' . strlen($faceImage) . ')' : 'no') . "\n", FILE_APPEND);
-                file_put_contents($debugFile, "FaceAuthService available: " . ($this->faceAuthService->isAvailable() ? 'yes' : 'no') . "\n", FILE_APPEND);
                 
                 if (is_string($faceImage) && $faceImage !== '' && $this->faceAuthService->isAvailable()) {
                     try {
                         $faceRegistered = $this->faceAuthService->registerFace($user, $faceImage);
-                        file_put_contents($debugFile, "Face registration result: " . ($faceRegistered ? 'success' : 'failed') . "\n", FILE_APPEND);
                         if ($faceRegistered) {
                             $this->addFlash('success', 'Face recognition enabled! You can now log in with your face.');
                         }
                     } catch (\Exception $e) {
-                        file_put_contents($debugFile, "Face registration error: " . $e->getMessage() . "\n", FILE_APPEND);
                     }
                 } else {
-                    file_put_contents($debugFile, "Face registration skipped: faceImage=" . (is_string($faceImage) && $faceImage !== '' ? 'set' : 'null') . ", serviceAvailable=" . ($this->faceAuthService->isAvailable() ? 'yes' : 'no') . "\n", FILE_APPEND);
                 }
 
                 // Add success message
