@@ -1,0 +1,118 @@
+{
+    "app": {
+        "path": "\/assets\/app-97cf5db159abcbbe9470d13a84afc10a.js",
+        "type": "js"
+    },
+    "\/assets\/bootstrap.js": {
+        "path": "\/assets\/bootstrap-c423b8bbc1f9cae218c105ca8ca9f767.js",
+        "type": "js"
+    },
+    "\/assets\/@symfony\/stimulus-bundle\/controllers.js": {
+        "path": "\/assets\/@symfony\/stimulus-bundle\/controllers-dc17a6083f823784f791a0c76afc3718.js",
+        "type": "js"
+    },
+    "\/assets\/@symfony\/ux-chartjs\/controller.js": {
+        "path": "\/assets\/@symfony\/ux-chartjs\/controller-2b631fe9f6962343d71ebbe25f0594ec.js",
+        "type": "js"
+    },
+    "\/assets\/@symfony\/ux-turbo\/turbo_controller.js": {
+        "path": "\/assets\/@symfony\/ux-turbo\/turbo_controller-f3040d8b6a5a81530e1ea5ec500d1142.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/hello_controller.js": {
+        "path": "\/assets\/controllers\/hello_controller-55882fcad241d2bea50276ea485583bc.js",
+        "type": "js"
+    },
+    "\/assets\/styles\/app.css": {
+        "path": "\/assets\/styles\/app-713d9828d7058036a44786836080554c.css",
+        "type": "css"
+    },
+    "@hotwired\/stimulus": {
+        "path": "\/assets\/vendor\/@hotwired\/stimulus\/stimulus.index-4b8ccd71e6b1c4ddba22853d5a50a26c.js",
+        "type": "js"
+    },
+    "@symfony\/stimulus-bundle": {
+        "path": "\/assets\/@symfony\/stimulus-bundle\/loader-5751ad1ee2975e725a94d8121d153d17.js",
+        "type": "js"
+    },
+    "@hotwired\/turbo": {
+        "path": "\/assets\/vendor\/@hotwired\/turbo\/turbo.index-745d80318151d002a6368cbf9900b302.js",
+        "type": "js"
+    },
+    "bootstrap": {
+        "path": "\/assets\/vendor\/bootstrap\/bootstrap.index-1e01aa1aff3ce04d1ff69adb835125cb.js",
+        "type": "js"
+    },
+    "@popperjs\/core": {
+        "path": "\/assets\/vendor\/@popperjs\/core\/core.index-4013baa633d6c530f3ac068433ba0593.js",
+        "type": "js"
+    },
+    "bootstrap\/dist\/css\/bootstrap.min.css": {
+        "path": "\/assets\/vendor\/bootstrap\/dist\/css\/bootstrap.min-cf4cd0b7e86ca2d4039dfed2b7d527d5.css",
+        "type": "css"
+    },
+    "@fortawesome\/fontawesome-free": {
+        "path": "\/assets\/vendor\/@fortawesome\/fontawesome-free\/fontawesome-free.index-d2b8739cb951252cd87610d930ce13c2.js",
+        "type": "js"
+    },
+    "@fortawesome\/fontawesome-free\/css\/fontawesome.min.css": {
+        "path": "\/assets\/vendor\/@fortawesome\/fontawesome-free\/css\/fontawesome.min-fe899ad4d288989ba906fabe0c923f26.css",
+        "type": "css"
+    },
+    "tiny-slider": {
+        "path": "\/assets\/vendor\/tiny-slider\/tiny-slider.index-a0dcef511f5a7f8bb30a11fac06704ad.js",
+        "type": "js"
+    },
+    "glightbox": {
+        "path": "\/assets\/vendor\/glightbox\/glightbox.index-0e9683bda0b28220fe10b5246082f93a.js",
+        "type": "js"
+    },
+    "choices.js": {
+        "path": "\/assets\/vendor\/choices.js\/choices.js.index-6e79e5f7cb8f39d090e293ac1e576239.js",
+        "type": "js"
+    },
+    "aos": {
+        "path": "\/assets\/vendor\/aos\/aos.index-ca14d2c7d496924e33414ef0870f7da1.js",
+        "type": "js"
+    },
+    "quill": {
+        "path": "\/assets\/vendor\/quill\/quill.index-410b6fc8952b329f22647b4b15c02287.js",
+        "type": "js"
+    },
+    "lodash-es": {
+        "path": "\/assets\/vendor\/lodash-es\/lodash-es.index-0401292cea1f214db13074a18d82b1c0.js",
+        "type": "js"
+    },
+    "parchment": {
+        "path": "\/assets\/vendor\/parchment\/parchment.index-6dc381b685b0e985ee1a833855fdf584.js",
+        "type": "js"
+    },
+    "quill-delta": {
+        "path": "\/assets\/vendor\/quill-delta\/quill-delta.index-40c61784442a10a009e15779abf6dbd4.js",
+        "type": "js"
+    },
+    "eventemitter3": {
+        "path": "\/assets\/vendor\/eventemitter3\/eventemitter3.index-699f06d151d9059d5ee5e2dbade922da.js",
+        "type": "js"
+    },
+    "fast-diff": {
+        "path": "\/assets\/vendor\/fast-diff\/fast-diff.index-4f1e278a93b7cc44bc02392fe1ade40e.js",
+        "type": "js"
+    },
+    "lodash.clonedeep": {
+        "path": "\/assets\/vendor\/lodash.clonedeep\/lodash.clonedeep.index-80add90d49e3d173ce2e211b15d7347d.js",
+        "type": "js"
+    },
+    "lodash.isequal": {
+        "path": "\/assets\/vendor\/lodash.isequal\/lodash.isequal.index-884aca4f3901ff0c1b85a84057c31d2a.js",
+        "type": "js"
+    },
+    "chart.js": {
+        "path": "\/assets\/vendor\/chart.js\/chart.js.index-d3a4cd32499b49a07abf29cf42de1161.js",
+        "type": "js"
+    },
+    "apexcharts": {
+        "path": "\/assets\/vendor\/apexcharts\/apexcharts.index-7114e7178937fd97b186eb85766c09e4.js",
+        "type": "js"
+    }
+}
