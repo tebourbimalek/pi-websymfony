@@ -1467,19 +1467,8 @@ class QuizController extends AbstractController
                 throw $this->createAccessDeniedException('You must be enrolled in the course to take this quiz');
             }
 
-            // Check if user has completed all lessons in the course
-            $lessons = $this->entityManager->getRepository(\App\Entity\Lesson::class)
-                ->findByCourse($course);
-            
-            $completedLessons = $this->entityManager->getRepository(\App\Entity\LessonCompletion::class)
-                ->findByUserAndCourse($user, $course);
-
-            error_log('Course ID: ' . $course->getId());
-            error_log('Total lessons: ' . count($lessons));
-            error_log('Completed lessons: ' . count($completedLessons));
-
-            if (count($completedLessons) < count($lessons)) {
-                error_log('User has not completed all lessons, redirecting to course');
+            // Use enrollment progress to check completion (same as my-courses page)
+            if ($enrollment->getProgress() < 100) {
                 $this->addFlash('warning', 'You must complete all lessons before taking the final quiz.');
                 return $this->redirectToRoute('app_course_dashboard', ['id' => $course->getId()]);
             }

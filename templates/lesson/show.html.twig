@@ -141,7 +141,7 @@
             button.disabled = true;
             button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Completing...';
             
-            fetch(`/lesson/{{ lesson.id }}/complete`, {
+            fetch(`/lesson/{{ lesson.id }}/complete-course`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -172,7 +172,7 @@
             button.disabled = true;
             button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Completing...';
             
-            fetch(`/lesson/{{ lesson.id }}/complete`, {
+            fetch(`/lesson/{{ lesson.id }}/complete-course`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

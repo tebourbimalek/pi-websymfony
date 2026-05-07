@@ -364,8 +364,23 @@ class EnrollmentController extends AbstractController
                 continue;
             }
             
-            // Check if course is complete (progress >= 100 or status = completed)
-            $isComplete = $enrollment->getProgress() >= 100 || $enrollment->getStatus() === 'completed';
+            // Check if course is complete - recalculate progress from DB
+            $totalLessons = count($this->entityManager->getRepository(\App\Entity\Lesson::class)
+                ->findByCourse($course));
+            $completedCount = count($this->lessonCompletionRepository->findByUserAndCourse($user, $course));
+            $actualProgress = $totalLessons > 0 ? min(($completedCount / $totalLessons) * 100, 100) : 0;
+            
+            // Update stored progress if different
+            if (abs($actualProgress - $enrollment->getProgress()) > 0.1) {
+                $enrollment->setProgress($actualProgress);
+                if ($actualProgress >= 100 && $enrollment->getStatus() !== 'completed') {
+                    $enrollment->setStatus('completed');
+                    $enrollment->setCompletedAt(new \DateTimeImmutable());
+                }
+                $this->entityManager->flush();
+            }
+            
+            $isComplete = $actualProgress >= 100 || $enrollment->getStatus() === 'completed';
             
             // Check if user has certificate for this course (with error handling for orphaned certificates)
             $certificate = null;
@@ -378,33 +393,45 @@ class EnrollmentController extends AbstractController
                 $hasCertificate = false;
             }
             
-            // Check if course has quizzes available
+            // Check if course has quizzes available (use DB query instead of lazy-loaded collection)
+            $courseQuiz = null;
+            $canTakeQuiz = false;
+            $quizPassed = false;
             try {
-                $canTakeQuiz = $course->getQuizzes()->count() > 0;
-            } catch (\Doctrine\ORM\EntityNotFoundException $e) {
-                continue;
+                $courseQuiz = $this->entityManager->getRepository(\App\Entity\Quiz::class)
+                    ->findOneBy(['course' => $course]);
+                $canTakeQuiz = $courseQuiz !== null;
+                
+                // Check if user already passed the quiz
+                if ($canTakeQuiz) {
+                    $quizResult = $this->entityManager->getRepository(\App\Entity\QuizResult::class)
+                        ->createQueryBuilder('qr')
+                        ->where('qr.user = :user')
+                        ->andWhere('qr.quiz = :quiz')
+                        ->andWhere('qr.score >= qr.maxScore * 0.8')
+                        ->setParameter('user', $user)
+                        ->setParameter('quiz', $courseQuiz)
+                        ->setMaxResults(1)
+                        ->getQuery()
+                        ->getOneOrNullResult();
+                    $quizPassed = $quizResult !== null;
+                }
+            } catch (\Exception $e) {
+                $canTakeQuiz = false;
+                $quizPassed = false;
             }
             
-            // Get first quiz if available
-            $firstQuiz = null;
-            if ($canTakeQuiz) {
-                try {
-                    foreach ($course->getQuizzes() as $quiz) {
-                        $firstQuiz = $quiz;
-                        break;
-                    }
-                } catch (\Doctrine\ORM\EntityNotFoundException $e) {
-                    $firstQuiz = null;
-                }
-            }
+            $firstQuiz = $courseQuiz;
             
             $enrollmentData[] = [
                 'enrollment' => $enrollment,
                 'isComplete' => $isComplete,
                 'hasCertificate' => $hasCertificate,
                 'canTakeQuiz' => $canTakeQuiz,
+                'quizPassed' => $quizPassed,
                 'firstQuiz' => $firstQuiz,
                 'certificate' => $certificate,
+                'actualProgress' => $actualProgress,
             ];
         }
 

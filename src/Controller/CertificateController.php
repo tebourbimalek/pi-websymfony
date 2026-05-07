@@ -784,49 +784,32 @@ class CertificateController extends AbstractController
             $this->logger->info('Loading certificates for user: ' . $user->getId() . ' (' . $user->getEmail() . ')');
             
             // Get user's certificates from database
-            $certificates = $this->entityManager->getRepository(Certificate::class)
-                ->findByUser($user);
-            
-            // Debug: Log certificates count
-            $this->logger->info('Found ' . count($certificates) . ' certificates in database');
+            $certificates = [];
+            try {
+                $certificates = $this->entityManager->getRepository(Certificate::class)
+                    ->findByUser($user);
+                $this->logger->info('Found ' . count($certificates) . ' certificates for user ' . $user->getId());
+            } catch (\Exception $e) {
+                $this->logger->warning('Could not load certificates: ' . $e->getMessage());
+            }
 
             // Also get quiz results with 80%+ score for certificates that might not have been saved yet
-            $passedQuizResults = $this->entityManager->getRepository(QuizResult::class)
-                ->createQueryBuilder('qr')
-                ->select('qr', 'q', 'c')
-                ->join('qr.quiz', 'q')
-                ->join('q.course', 'c')
-                ->where('qr.user = :user')
-                ->andWhere('qr.score >= qr.maxScore * 0.8') // 80% or higher
-                ->orderBy('qr.takenAt', 'DESC')
-                ->setParameter('user', $user)
-                ->getQuery()
-                ->getResult();
-            
-            // Debug: Log passed quiz results count
-            $this->logger->info('Found ' . count($passedQuizResults) . ' passed quiz results');
-            
-            // Debug: Log details of each passed quiz result
-            foreach ($passedQuizResults as $result) {
-                // Handle the case where result might be a single object or an array
-                if (is_array($result)) {
-                    $quizResult = $result[0] ?? null;
-                    $quiz = $result[1] ?? null;
-                    $course = $result[2] ?? null;
-                } else {
-                    // If it's a single object, get the related entities
-                    $quizResult = $result;
-                    $quiz = $result->getQuiz();
-                    $course = $quiz ? $quiz->getCourse() : null;
-                }
-                
-                if ($quizResult && $course) {
-                    $percentage = ($quizResult->getScore() / $quizResult->getMaxScore()) * 100;
-                    $this->logger->info('Quiz Result: ID=' . $quizResult->getId() . 
-                        ', Course=' . $course->getTitle() . 
-                        ', Score=' . $quizResult->getScore() . '/' . $quizResult->getMaxScore() . 
-                        ' (' . round($percentage, 1) . '%)');
-                }
+            $passedQuizResults = [];
+            try {
+                $passedQuizResults = $this->entityManager->getRepository(QuizResult::class)
+                    ->createQueryBuilder('qr')
+                    ->select('qr', 'q', 'c')
+                    ->join('qr.quiz', 'q')
+                    ->join('q.course', 'c')
+                    ->where('qr.user = :user')
+                    ->andWhere('qr.score >= qr.maxScore * 0.8')
+                    ->orderBy('qr.takenAt', 'DESC')
+                    ->setParameter('user', $user)
+                    ->getQuery()
+                    ->getResult();
+                $this->logger->info('Found ' . count($passedQuizResults) . ' passed quiz results for user ' . $user->getId());
+            } catch (\Exception $e) {
+                $this->logger->warning('Could not load quiz results: ' . $e->getMessage());
             }
 
             return $this->render('certificate/my_certificates.html.twig', [
@@ -839,8 +822,12 @@ class CertificateController extends AbstractController
             return $this->redirectToRoute('app_login');
         } catch (\Exception $e) {
             $this->logger->error('Error loading user certificates: ' . $e->getMessage());
-            $this->addFlash('error', 'Unable to load certificates. Please try again later.');
-            return $this->redirectToRoute('app_my_courses');
+            // Still render the page instead of redirecting to courses
+            return $this->render('certificate/my_certificates.html.twig', [
+                'certificates' => [],
+                'passedQuizResults' => [],
+                'user' => $this->getUser()
+            ]);
         }
     }
 }

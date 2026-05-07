@@ -368,30 +368,23 @@ class LessonController extends AbstractController
         $isInstructor = $courseUser !== null && $user !== null && $courseUser->getId() === $user->getId();
         $hasInstructorRole = $user !== null && in_array('ROLE_INSTRUCTOR', $user->getRoles(), true);
         
-        // Instructors can complete their own course lessons without enrollment
-        if ($isInstructor && $hasInstructorRole && $user instanceof \App\Entity\User) {
-            // Allow lesson completion for instructors
-            $existingCompletion = $this->lessonCompletionRepository->findOneByUserAndLesson($user, $lesson);
-            
-            if ($existingCompletion === null) {
-                $lessonCompletion = new LessonCompletion();
-                $lessonCompletion->setUser($user);
-                $lessonCompletion->setLesson($lesson);
-                $lessonCompletion->setCourse($course);
-                $lessonCompletion->setCompletedAt(new \DateTimeImmutable());
-                
-                $this->entityManager->persist($lessonCompletion);
-                $this->entityManager->flush();
-            }
-            
-            return $this->json(['success' => true, 'message' => 'Lesson marked as complete']);
-        }
-
-        if (!$user instanceof \App\Entity\User) {
+        if (!($user instanceof \App\Entity\User)) {
             return $this->json(['success' => false, 'message' => 'User not authenticated']);
         }
 
         $enrollment = $this->enrollmentRepository->findOneByUserAndCourse($user, $course);
+
+        // Instructors can complete their own course lessons without enrollment
+        if ($enrollment === null && $isInstructor && $hasInstructorRole) {
+            // Create enrollment for instructor if missing
+            $enrollment = new \App\Entity\Enrollment();
+            $enrollment->setUser($user);
+            $enrollment->setCourse($course);
+            $enrollment->setStatus('active');
+            $enrollment->setProgress(0.0);
+            $this->entityManager->persist($enrollment);
+            $this->entityManager->flush();
+        }
 
         if ($enrollment === null) {
             return $this->json(['success' => false, 'message' => 'Not enrolled in this course']);
@@ -417,10 +410,16 @@ class LessonController extends AbstractController
         }
 
         // Update enrollment progress
-        $currentProgress = $enrollment->getProgress();
-        $totalLessons = $course->getTotalLessons();
-        $completedLessons = count($this->lessonCompletionRepository->findByUserAndCourse($user, $course));
-        $newProgress = min(($completedLessons / $totalLessons) * 100, 100);
+        // Use DB query for total lessons (same as Java version) to avoid lazy-loading issues
+        $totalLessons = count($this->entityManager->getRepository(\App\Entity\Lesson::class)
+            ->findByCourse($course));
+        
+        if ($totalLessons <= 0) {
+            $totalLessons = 1; // Prevent division by zero
+        }
+        
+        $completedCount = count($this->lessonCompletionRepository->findByUserAndCourse($user, $course));
+        $newProgress = min(($completedCount / $totalLessons) * 100, 100);
         
         $enrollment->setProgress($newProgress);
         
@@ -435,9 +434,71 @@ class LessonController extends AbstractController
         return $this->json([
             'success' => true, 
             'message' => 'Lesson completed successfully!',
-            'progress' => $newProgress,
+            'progress' => round($newProgress, 1),
+            'completedCount' => $completedCount,
+            'totalLessons' => $totalLessons,
             'isCompleted' => $newProgress >= 100,
             'xp_awarded' => $existingCompletion === null ? 10 : 0
+        ]);
+    }
+
+    #[Route('/lesson/{id}/complete-course', name: 'app_lesson_complete_course', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function completeAllLessons(Lesson $lesson, Request $request): Response
+    {
+        $chapter = $lesson->getChapter();
+        $course = $chapter !== null ? $chapter->getCourse() : null;
+
+        if ($course === null) {
+            return $this->json(['success' => false, 'message' => 'Course not found']);
+        }
+
+        $user = $this->getUser();
+
+        if (!($user instanceof \App\Entity\User)) {
+            return $this->json(['success' => false, 'message' => 'User not authenticated']);
+        }
+
+        $enrollment = $this->enrollmentRepository->findOneByUserAndCourse($user, $course);
+
+        if ($enrollment === null) {
+            return $this->json(['success' => false, 'message' => 'Not enrolled in this course']);
+        }
+
+        // Get ALL lessons in the course
+        $allLessons = $this->entityManager->getRepository(\App\Entity\Lesson::class)
+            ->findByCourse($course);
+
+        // Mark ALL lessons as completed
+        $newlyCompleted = 0;
+        foreach ($allLessons as $courseLesson) {
+            $existingCompletion = $this->lessonCompletionRepository->findOneByUserAndLesson($user, $courseLesson);
+            if ($existingCompletion === null) {
+                $lessonCompletion = new LessonCompletion();
+                $lessonCompletion->setUser($user);
+                $lessonCompletion->setLesson($courseLesson);
+                $lessonCompletion->setCourse($course);
+                $lessonCompletion->setCompletedAt(new \DateTimeImmutable());
+                $this->entityManager->persist($lessonCompletion);
+                $newlyCompleted++;
+            }
+        }
+
+        // Update enrollment progress to 100%
+        $enrollment->setProgress(100);
+        $enrollment->setStatus('completed');
+        $enrollment->setCompletedAt(new \DateTimeImmutable());
+
+        $this->entityManager->flush();
+
+        return $this->json([
+            'success' => true,
+            'message' => 'All lessons completed! Course finished.',
+            'progress' => 100,
+            'completedCount' => count($allLessons),
+            'totalLessons' => count($allLessons),
+            'isCompleted' => true,
+            'xp_awarded' => $newlyCompleted * 10
         ]);
     }
 }

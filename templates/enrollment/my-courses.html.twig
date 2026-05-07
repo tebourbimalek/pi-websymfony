@@ -145,7 +145,6 @@ html, body {
 {% endblock %}
 
 {% block content %}
-<!-- Flash Messages -->
 {% for message in app.flashes('error') %}
     <div data-flash-type="error" 
          data-flash-title="Access Denied" 
@@ -178,14 +177,30 @@ html, body {
                         {% set canTakeQuiz = data.canTakeQuiz %}
                         {% set firstQuiz = data.firstQuiz %}
                         {% set certificate = data.certificate %}
+                        {% set actualProgress = data.actualProgress|default(0) %}
+                        {% set quizPassed = data.quizPassed|default(false) %}
                         <div class="col-md-6 col-lg-4 mb-4">
                             <div class="course-card">
-                                <!-- Course Image/Placeholder -->
-                                <div class="course-image">
-                                    <i class="fas fa-graduation-cap"></i>
-                                </div>
+                                {# Course Image with progress-based color #}
+                                {% if actualProgress >= 100 %}
+                                    <div class="course-image" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+                                        <i class="fas fa-trophy"></i>
+                                    </div>
+                                {% elseif actualProgress >= 50 %}
+                                    <div class="course-image" style="background: linear-gradient(135deg, #6f42c1 0%, #9b59b6 100%);">
+                                        <i class="fas fa-graduation-cap"></i>
+                                    </div>
+                                {% elseif actualProgress > 0 %}
+                                    <div class="course-image" style="background: linear-gradient(135deg, #fd7e14 0%, #ffc107 100%);">
+                                        <i class="fas fa-book-reader"></i>
+                                    </div>
+                                {% else %}
+                                    <div class="course-image" style="background: linear-gradient(135deg, #6c757d 0%, #adb5bd 100%);">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                {% endif %}
                                 
-                                <!-- Course Content -->
+                                {# Course Content #}
                                 <div class="course-content">
                                     <h3 class="course-title">{{ enrollment.course.title }}</h3>
                                     
@@ -202,36 +217,65 @@ html, body {
                                         </div>
                                     </div>
                                     
-                                    <!-- Progress -->
-                                    <div class="progress-info">
-                                        <span class="fw-semibold">Progress</span>
-                                        <span class="fw-bold">{{ enrollment.progress|round }}%</span>
-                                    </div>
-                                    <div class="progress mb-3">
-                                        <div class="progress-bar progress-bar-custom" style="width: {{ enrollment.progress }}%"></div>
+                                    {# Status #}
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        {% if actualProgress >= 100 %}
+                                            <i class="fas fa-check-circle text-success"></i>
+                                            <span class="fw-semibold text-success">Completed</span>
+                                        {% elseif actualProgress > 0 %}
+                                            <i class="fas fa-spinner text-warning"></i>
+                                            <span class="fw-semibold text-warning">In Progress</span>
+                                        {% else %}
+                                            <i class="fas fa-play-circle text-muted"></i>
+                                            <span class="fw-semibold text-muted">Not Started</span>
+                                        {% endif %}
+                                        <span class="ms-auto fw-bold">{{ actualProgress|round }}% Complete</span>
                                     </div>
                                     
-                                    <!-- Actions -->
+                                    {# Progress Bar #}
+                                    <div class="progress mb-2" style="height: 8px;">
+                                        {% if actualProgress >= 100 %}
+                                            <div class="progress-bar bg-success" style="width: {{ actualProgress }}%"></div>
+                                        {% elseif actualProgress >= 50 %}
+                                            <div class="progress-bar" style="width: {{ actualProgress }}%; background-color: #6f42c1;"></div>
+                                        {% elseif actualProgress > 0 %}
+                                            <div class="progress-bar bg-warning" style="width: {{ actualProgress }}%"></div>
+                                        {% else %}
+                                            <div class="progress-bar bg-secondary" style="width: 0%"></div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    {# Actions #}
                                     <div class="course-actions">
-                                        {% if isComplete and hasCertificate and certificate is not null and certificate.quizResult is not null %}
-                                            {# Course complete and has certificate - show View Certificate #}
-                                            <a href="{{ path('quiz_certificate', {'id': certificate.quizResult.id}) }}" class="action-btn certificate-btn">
+                                        {% if hasCertificate %}
+                                            {% if certificate is not null and certificate.quizResult is not null %}
+                                                <a href="{{ path('quiz_certificate', {'id': certificate.quizResult.id}) }}" class="action-btn certificate-btn">
+                                                    <i class="fas fa-certificate me-1"></i>View Certificate
+                                                </a>
+                                            {% elseif firstQuiz is not null %}
+                                                <a href="{{ path('quiz_certificate', {'id': firstQuiz.id}) }}" class="action-btn certificate-btn">
+                                                    <i class="fas fa-certificate me-1"></i>View Certificate
+                                                </a>
+                                            {% else %}
+                                                <a href="{{ path('app_my_certificates') }}" class="action-btn certificate-btn">
+                                                    <i class="fas fa-certificate me-1"></i>View Certificate
+                                                </a>
+                                            {% endif %}
+                                        {% elseif quizPassed and firstQuiz is not null %}
+                                            <a href="{{ path('quiz_certificate', {'id': firstQuiz.id}) }}" class="action-btn certificate-btn">
                                                 <i class="fas fa-certificate me-1"></i>View Certificate
                                             </a>
-                                        {% elseif (isComplete or enrollment.progress >= 100) and canTakeQuiz and firstQuiz is not null and not hasCertificate %}
-                                            {# Course complete/progress 100%, has quiz but no certificate - show Take Quiz #}
+                                        {% elseif actualProgress >= 100 and canTakeQuiz and firstQuiz is not null %}
                                             <a href="{{ path('quiz_take', {'id': firstQuiz.id}) }}" class="action-btn quiz-btn">
                                                 <i class="fas fa-question-circle me-1"></i>Take Quiz
                                             </a>
-                                        {% elseif isComplete and enrollment.progress >= 100 and not hasCertificate %}
-                                            {# Course complete and progress 100%, no quiz - show Take Test #}
+                                        {% elseif actualProgress >= 100 and not canTakeQuiz %}
                                             <a href="{{ path('app_course_test', {'id': enrollment.course.id}) }}" class="action-btn quiz-btn">
                                                 <i class="fas fa-clipboard-check me-1"></i>Take Test
                                             </a>
                                         {% else %}
-                                            {# Course not complete - show Continue #}
                                             <a href="{{ path('app_course_dashboard', {'id': enrollment.course.id}) }}" class="action-btn continue-btn">
-                                                <i class="fas fa-play me-1"></i>Continue
+                                                <i class="fas fa-play me-1"></i>Continue Learning
                                             </a>
                                         {% endif %}
                                         <a href="{{ path('app_course_show', {'id': enrollment.course.id}) }}" class="action-btn dashboard-btn">
@@ -239,7 +283,7 @@ html, body {
                                         </a>
                                     </div>
                                     
-                                    <!-- Enrollment Date -->
+                                    {# Enrollment Date #}
                                     <div class="enrollment-date">
                                         <i class="fas fa-calendar me-1"></i>
                                         Enrolled on {{ enrollment.enrolledAt|date('M d, Y') }}
@@ -263,6 +307,5 @@ html, body {
     </div>
 </div>
 
-<!-- Include Footer -->
 {% include 'components/footer.html.twig' %}
 {% endblock %}
