@@ -72,7 +72,7 @@
 
 							<!-- Form START -->
 							{% if loginForm is defined %}
-								{{ form_start(loginForm, {'method': 'POST', 'action': path('app_login'), 'attr': {'novalidate': 'novalidate'}}) }}
+								{{ form_start(loginForm, {'method': 'POST', 'action': path('app_login'), 'attr': {'novalidate': 'novalidate', 'data-turbo': 'false'}}) }}
 									{{ form_errors(loginForm) }}
 									<!-- Email -->
 									<div class="mb-4">

@@ -105,7 +105,7 @@
 							{% endif %}
 						
 							<!-- Form START -->
-							{{ form_start(registrationForm, {'attr': {'novalidate': 'novalidate'}}) }}
+							{{ form_start(registrationForm, {'attr': {'novalidate': 'novalidate', 'data-turbo': 'false'}}) }}
 								<!-- Full Name -->
 								<div class="mb-4">
 									<label for="{{ registrationForm.fullName.vars.id }}" class="form-label">Full Name *</label>

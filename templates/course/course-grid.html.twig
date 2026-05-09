@@ -764,67 +764,34 @@ nav[aria-label="Course pagination"]::before {
                             <div class="card course-card shadow h-100 {% if 'Ruby' in course.title or 'Rails' in course.title %}ruby-course{% endif %}">
                                 <!-- Course Image -->
                                 {% set thumbnail = course.thumbnailUrl %}
-                                {% if thumbnail %}
-                                    <div class="course-image-container">
+                                <div class="course-image-container">
+                                    {% if thumbnail %}
                                         {% if thumbnail starts with 'http' or thumbnail starts with 'https' %}
-                                            <img src="{{ thumbnail }}" class="card-img-top" alt="{{ course.title }}">
+                                            <img src="{{ thumbnail }}" class="card-img-top" alt="{{ course.title }}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=250&fit=crop&auto=format';">
+                                        {% elseif thumbnail starts with '/uploads' %}
+                                            <img src="{{ asset(thumbnail) }}" class="card-img-top" alt="{{ course.title }}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=250&fit=crop&auto=format';">
                                         {% else %}
-                                            <img src="{{ asset(thumbnail) }}" class="card-img-top" alt="{{ course.title }}">
+                                            <img src="{{ asset(thumbnail) }}" class="card-img-top" alt="{{ course.title }}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=250&fit=crop&auto=format';">
                                         {% endif %}
-                                        <div class="course-image-overlay">
-                                            <div class="course-duration-badge">
-                                                <i class="fas fa-clock me-1"></i>
-                                                {% if course.duration %}{{ course.duration }}h{% else %}Self-paced{% endif %}
-                                            </div>
-                                            <div class="course-level-badge">
-                                                {{ course.level|default('Beginner') }}
-                                            </div>
-                                            {% if 'Ruby' in course.title or 'Rails' in course.title %}
-                                            <div class="ruby-badge">
-                                                <i class="fas fa-gem"></i>
-                                                Ruby/Rails
-                                            </div>
-                                            {% endif %}
+                                    {% else %}
+                                        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=250&fit=crop&auto=format" class="card-img-top" alt="{{ course.title }}">
+                                    {% endif %}
+                                    <div class="course-image-overlay">
+                                        <div class="course-duration-badge">
+                                            <i class="fas fa-clock me-1"></i>
+                                            {% if course.duration %}{{ course.duration }}h{% else %}Self-paced{% endif %}
                                         </div>
-                                    </div>
-                                {% else %}
-                                    <div class="course-image-container">
-                                        {% set randomImage = random(['programming', 'webdev', 'design', 'business', 'data']) %}
+                                        <div class="course-level-badge">
+                                            {{ course.level|default('Beginner') }}
+                                        </div>
                                         {% if 'Ruby' in course.title or 'Rails' in course.title %}
-                                            {% set randomImage = 'ruby' %}
-                                        {% endif %}
-                                        {% if randomImage == 'programming' %}
-                                            <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=250&fit=crop&auto=format" class="card-img-top" alt="{{ course.title }}">
-                                        {% elseif randomImage == 'webdev' %}
-                                            <img src="https://images.unsplash.com/photo-1522252234503-e356532cafd5?w=400&h=250&fit=crop&auto=format" class="card-img-top" alt="{{ course.title }}">
-                                        {% elseif randomImage == 'design' %}
-                                            <img src="https://images.unsplash.com/photo-1559028006-848465da746a?w=400&h=250&fit=crop&auto=format" class="card-img-top" alt="{{ course.title }}">
-                                        {% elseif randomImage == 'business' %}
-                                            <img src="https://images.unsplash.com/photo-1507003211169-0a1a7661f27?w=400&h=250&fit=crop&auto=format" class="card-img-top" alt="{{ course.title }}">
-                                        {% elseif randomImage == 'data' %}
-                                            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=250&fit=crop&auto=format" class="card-img-top" alt="{{ course.title }}">
-                                        {% elseif randomImage == 'ruby' %}
-                                            <img src="https://images.unsplash.com/photo-1618399812474-7b6e8aebf1b?w=400&h=250&fit=crop&auto=format" class="card-img-top" alt="{{ course.title }}">
-                                        {% else %}
-                                            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=250&fit=crop&auto=format" class="card-img-top" alt="{{ course.title }}">
-                                        {% endif %}
-                                        <div class="course-image-overlay">
-                                            <div class="course-duration-badge">
-                                                <i class="fas fa-clock me-1"></i>
-                                                {% if course.duration %}{{ course.duration }}h{% else %}Self-paced{% endif %}
-                                            </div>
-                                            <div class="course-level-badge">
-                                                {{ course.level|default('Beginner') }}
-                                            </div>
-                                            {% if 'Ruby' in course.title or 'Rails' in course.title %}
-                                            <div class="ruby-badge">
-                                                <i class="fas fa-gem"></i>
-                                                Ruby/Rails
-                                            </div>
-                                            {% endif %}
+                                        <div class="ruby-badge">
+                                            <i class="fas fa-gem"></i>
+                                            Ruby/Rails
                                         </div>
+                                        {% endif %}
                                     </div>
-                                {% endif %}
+                                </div>
                                 
                                 <!-- Card Body -->
                                 <div class="card-body pb-0">

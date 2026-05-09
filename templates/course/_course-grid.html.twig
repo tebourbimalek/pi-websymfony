@@ -9,9 +9,13 @@
             <div class="card course-card shadow h-100">
                 <!-- Course Image -->
                 {% if course.thumbnailUrl %}
-                    <img src="{{ asset('uploads/courses/' ~ course.thumbnailUrl) }}" class="card-img-top" alt="{{ course.title }}">
+                    {% if course.thumbnailUrl starts with 'http' or course.thumbnailUrl starts with 'https' %}
+                        <img src="{{ course.thumbnailUrl }}" class="card-img-top" alt="{{ course.title }}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=250&fit=crop&auto=format';">
+                    {% else %}
+                        <img src="{{ asset(course.thumbnailUrl) }}" class="card-img-top" alt="{{ course.title }}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=250&fit=crop&auto=format';">
+                    {% endif %}
                 {% else %}
-                    <img src="/assets/images/courses/default-course.jpg" class="card-img-top" alt="{{ course.title }}">
+                    <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=250&fit=crop&auto=format" class="card-img-top" alt="{{ course.title }}">
                 {% endif %}
                 
                 <!-- Card Body -->

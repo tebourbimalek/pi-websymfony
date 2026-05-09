@@ -188,50 +188,27 @@ Student Courses START -->
                                 <div class="col-md-6 col-lg-4">
                                     <div class="card h-100 border-0 shadow-sm course-card">
                                         {% set thumbnail = enrollment.course.thumbnailUrl %}
-                                        {% if thumbnail %}
-                                            <div class="course-image-container">
+                                        <div class="course-image-container">
+                                            {% if thumbnail %}
                                                 {% if thumbnail starts with 'http' or thumbnail starts with 'https' %}
-                                                    <img src="{{ thumbnail }}" class="card-img-top" alt="{{ enrollment.course.title }}" style="height: 200px; object-fit: cover;">
+                                                    <img src="{{ thumbnail }}" class="card-img-top" alt="{{ enrollment.course.title }}" style="height: 200px; object-fit: cover;" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=250&fit=crop&auto=format';">
                                                 {% else %}
-                                                    <img src="{{ asset(thumbnail) }}" class="card-img-top" alt="{{ enrollment.course.title }}" style="height: 200px; object-fit: cover;">
+                                                    <img src="{{ asset(thumbnail) }}" class="card-img-top" alt="{{ enrollment.course.title }}" style="height: 200px; object-fit: cover;" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=250&fit=crop&auto=format';">
                                                 {% endif %}
-                                                <div class="course-image-overlay">
-                                                    <div class="course-progress-badge">
-                                                        <i class="fas fa-chart-line me-1"></i>
-                                                        {{ enrollment.progress|round }}% Complete
-                                                    </div>
-                                                    <div class="course-duration-badge">
-                                                        <i class="fas fa-clock me-1"></i>
-                                                        {% if enrollment.course.duration %}{{ enrollment.course.duration }}h{% else %}Self-paced{% endif %}
-                                                    </div>
+                                            {% else %}
+                                                <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=250&fit=crop&auto=format" class="card-img-top" alt="{{ enrollment.course.title }}" style="height: 200px; object-fit: cover;">
+                                            {% endif %}
+                                            <div class="course-image-overlay">
+                                                <div class="course-progress-badge">
+                                                    <i class="fas fa-chart-line me-1"></i>
+                                                    {{ enrollment.progress|round }}% Complete
+                                                </div>
+                                                <div class="course-duration-badge">
+                                                    <i class="fas fa-clock me-1"></i>
+                                                    {% if enrollment.course.duration %}{{ enrollment.course.duration }}h{% else %}Self-paced{% endif %}
                                                 </div>
                                             </div>
-                                        {% else %}
-                                            <div class="course-image-container">
-                                                {% set randomImage = random(['programming', 'webdev', 'design', 'business', 'data']) %}
-                                                {% if randomImage == 'programming' %}
-                                                    <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=250&fit=crop&auto=format" class="card-img-top" alt="{{ enrollment.course.title }}" style="height: 200px; object-fit: cover;">
-                                                {% elseif randomImage == 'webdev' %}
-                                                    <img src="https://images.unsplash.com/photo-1522252234503-e356532cafd5?w=400&h=250&fit=crop&auto=format" class="card-img-top" alt="{{ enrollment.course.title }}" style="height: 200px; object-fit: cover;">
-                                                {% elseif randomImage == 'design' %}
-                                                    <img src="https://images.unsplash.com/photo-1559028006-848865316f3c?w=400&h=250&fit=crop&auto=format" class="card-img-top" alt="{{ enrollment.course.title }}" style="height: 200px; object-fit: cover;">
-                                                {% elseif randomImage == 'business' %}
-                                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=250&fit=crop&auto=format" class="card-img-top" alt="{{ enrollment.course.title }}" style="height: 200px; object-fit: cover;">
-                                                {% else %}
-                                                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=250&fit=crop&auto=format" class="card-img-top" alt="{{ enrollment.course.title }}" style="height: 200px; object-fit: cover;">
-                                                {% endif %}
-                                                <div class="course-image-overlay">
-                                                    <div class="course-progress-badge">
-                                                        <i class="fas fa-chart-line me-1"></i>
-                                                        {{ enrollment.progress|round }}% Complete
-                                                    </div>
-                                                    <div class="course-duration-badge">
-                                                        <i class="fas fa-clock me-1"></i>
-                                                        {% if enrollment.course.duration %}{{ enrollment.course.duration }}h{% else %}Self-paced{% endif %}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        {% endif %}
+                                        </div>
                                         <div class="card-body">
                                             <h6 class="card-title">{{ enrollment.course.title }}</h6>
                                             <p class="card-text small text-muted">{{ enrollment.course.shortDescription|slice(0, 80) }}...</p>
@@ -296,12 +273,12 @@ Student Courses START -->
                                         {% set thumbnail = enrollment.course.thumbnailUrl %}
                                         {% if thumbnail %}
                                             {% if thumbnail starts with 'http' or thumbnail starts with 'https' %}
-                                                <img src="{{ thumbnail }}" class="card-img-top" alt="{{ enrollment.course.title }}" style="height: 200px; object-fit: cover;">
+                                                <img src="{{ thumbnail }}" class="card-img-top" alt="{{ enrollment.course.title }}" style="height: 200px; object-fit: cover;" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=250&fit=crop&auto=format';">
                                             {% else %}
-                                                <img src="{{ asset(thumbnail) }}" class="card-img-top" alt="{{ enrollment.course.title }}" style="height: 200px; object-fit: cover;">
+                                                <img src="{{ asset(thumbnail) }}" class="card-img-top" alt="{{ enrollment.course.title }}" style="height: 200px; object-fit: cover;" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=250&fit=crop&auto=format';">
                                             {% endif %}
                                         {% else %}
-                                            <img src="{{ asset('assets/images/courses/4by3/01.jpg') }}" class="card-img-top" alt="{{ enrollment.course.title }}" style="height: 200px; object-fit: cover;">
+                                            <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=250&fit=crop&auto=format" class="card-img-top" alt="{{ enrollment.course.title }}" style="height: 200px; object-fit: cover;">
                                         {% endif %}
                                         <div class="card-body">
                                             <div class="d-flex justify-content-between align-items-start mb-2">

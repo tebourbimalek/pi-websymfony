@@ -34,8 +34,10 @@ class RegistrationController extends AbstractController
         $form = $this->createForm(RegistrationType::class, $user);
         $form->handleRequest($request);
 
-        // Gestion des requêtes AJAX pour validation
-        if ($request->isXmlHttpRequest()) {
+        // Gestion des requêtes AJAX pour validation (but not Turbo)
+        if ($request->isXmlHttpRequest() && !$request->headers->has('Turbo-Frame')) {
+            $accept = $request->headers->get('Accept', '');
+            if (!str_contains($accept, 'turbo-stream')) {
             $form->submit($request->request->all());
 
             $errors = [];
@@ -55,6 +57,7 @@ class RegistrationController extends AbstractController
                 'valid' => $form->isValid(),
                 'errors' => $errors,
             ]);
+            }
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
